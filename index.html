@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; connect-src 'none'">
+<title>MARCA 사냥터 선택 시안</title>
+<style>
+:root{--bg:#fbf7ec;--paper:#fffdf8;--ink:#1d2733;--sub:#56606d;--line:#e2d6bb;--act:#2763c4;--focus:#d9620f;--ok:#2f7a45;--okbg:#e6f3e4;--lockbg:#f1ece0;--lockline:#b9a985}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Pretendard","Apple SD Gothic Neo","Malgun Gothic","맑은 고딕","Noto Sans KR","Noto Sans CJK KR",system-ui,sans-serif;word-break:keep-all;overflow-wrap:anywhere}
+.wrap{max-width:1200px;margin:0 auto;padding:16px 24px 40px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+svg{display:block}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 16px}
+.brand{display:flex;align-items:baseline;gap:8px;margin:0}
+.logo{font-weight:800;letter-spacing:.12em;font-size:14px;color:var(--act)}
+.slash{color:var(--line)}
+h1{font-size:20px;margin:0;font-weight:700}
+.badge{font-size:12px;font-weight:700;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:4px 10px;color:var(--sub);white-space:nowrap}
+.note{margin:4px 0 12px;font-size:13px;color:var(--sub)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:flex;gap:3px;padding:3px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+.seg button{min-height:44px;min-width:80px;padding:0 14px;border:0;border-radius:8px;background:transparent;font-weight:700;color:var(--sub)}
+.seg button[aria-pressed="true"]{background:var(--act);color:#fff}
+#compare-toggle{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--paper);font-weight:700;color:var(--sub)}
+#compare-toggle[aria-pressed="true"]{border-color:var(--act);background:#eaf1fc;color:var(--act)}
+.caption{margin:10px 0 0;font-size:15px;font-weight:700}
+
+/* shared filter bar */
+.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;margin:12px 0;padding-top:12px;border-top:1px solid var(--line)}
+.filters{display:flex;gap:6px}
+.filters button{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--paper);font-weight:700;color:var(--sub)}
+.filters button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:#fff}
+.filters .n{font-weight:400;margin-left:3px;opacity:.85}
+#selection-status{margin:0;font-size:13px;color:var(--sub)}
+#selection-status b{color:var(--ink)}
+.hid{color:#9a4508}
+
+/* stage */
+#stage.compare{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;align-items:start}
+.scene-h{display:none;margin:0 0 10px;font-size:15px}
+.scene-h span{display:block;font-size:12px;font-weight:400;color:var(--sub)}
+.compare .scene-h{display:block}
+#compare-slot{grid-column:1/-1}
+.empty{margin:12px 0;padding:16px;border:1px dashed var(--line);border-radius:10px;text-align:center;color:var(--sub);font-size:14px}
+
+/* pills + pixel art */
+.pills{display:flex;flex-wrap:wrap;gap:4px}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;line-height:1.5}
+.pill.ok{background:var(--okbg);color:var(--ok)}
+.pill.lock{background:var(--lockbg);color:#5a4f3a;box-shadow:inset 0 0 0 1px var(--lockline)}
+.pill.next{background:#fdeedd;color:#9a4508}
+.pill svg{width:8px;height:10px}
+.ic{display:block;overflow:hidden;border-radius:6px}
+.ic svg{width:100%;height:100%}
+
+/* A cards */
+.tabs{display:flex;align-items:flex-end;gap:12px;margin-bottom:12px;border-bottom:1px solid var(--line)}
+.tab{padding:6px 2px 8px;margin-bottom:-1px;border-bottom:3px solid var(--act);font-weight:700;font-size:14px}
+.tab-sub{padding-bottom:9px;font-size:13px;color:var(--sub)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0;padding:0;list-style:none}
+.card{position:relative;display:flex;flex-direction:column;width:100%;height:100%;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--paper);text-align:left;overflow:hidden}
+.card:hover{border-color:#cdbb92}
+.card .art{display:flex;align-items:center;justify-content:center;height:108px;border-bottom:1px solid var(--line)}
+.card .art svg{width:72px;height:72px}
+.card.is-locked .art svg{opacity:.75}
+.c-body{display:block;padding:10px 12px 12px}
+.c-name{display:block;font-size:16px;font-weight:700;line-height:1.3}
+.c-tags{display:block;margin:2px 0 8px;font-size:13px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card.is-selected{border-color:var(--act);box-shadow:0 0 0 2px var(--act)}
+.check{position:absolute;top:8px;right:8px;display:none;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--act)}
+.check::after{content:"";width:6px;height:11px;margin-top:-3px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg)}
+.card.is-selected .check{display:grid}
+.lockmark{position:absolute;top:8px;left:8px;display:grid;place-items:center;width:26px;height:26px;border-radius:6px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--lockline)}
+.lockmark svg{width:10px;height:12px}
+.scene-a .slot{margin-top:16px}
+
+/* B map */
+.b-body,.c-body-wrap{display:grid;gap:16px;align-items:start}
+.b-body{grid-template-columns:minmax(0,1fr) 340px}
+.map-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px 12px;margin:0 0 8px;font-size:14px;font-weight:700}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;font-weight:400;color:var(--sub)}
+.legend i{display:inline-block;width:10px;height:10px;margin-right:4px;border-radius:50%;vertical-align:-1px}
+.lg-open{background:#9fbb83}.lg-lock{border:2px dashed var(--lockline)}.lg-next{background:var(--focus)}
+.map{position:relative;aspect-ratio:16/11;border:1px solid #d5dcc0;border-radius:14px;overflow:hidden;background-color:#eef2e2;background-image:linear-gradient(#e3e9d4 1px,transparent 1px),linear-gradient(90deg,#e3e9d4 1px,transparent 1px);background-size:32px 32px}
+.paths{position:absolute;inset:0;width:100%;height:100%}
+.paths line{vector-effect:non-scaling-stroke;stroke-width:3;stroke-linecap:round}
+.p-open{stroke:#9fbb83}
+.p-lock{stroke:#c8bd9f;stroke-dasharray:5 7}
+.node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;min-width:64px;max-width:96px;padding:6px 6px 5px;border:0;border-radius:12px;background:rgba(255,253,248,.94);box-shadow:0 0 0 1px var(--line)}
+.node:hover{box-shadow:0 0 0 1px #cdbb92}
+.n-icon{position:relative;width:36px;height:36px}
+.n-icon .ic{width:36px;height:36px;border-radius:8px}
+.node.is-locked .ic{opacity:.75}
+.lk{position:absolute;right:-6px;bottom:-5px;display:grid;place-items:center;width:18px;height:18px;border-radius:5px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--lockline)}
+.lk svg{width:8px;height:10px}
+.n-label{font-size:13px;font-weight:700;line-height:1.2;white-space:nowrap}
+.n-state{font-size:11px;line-height:1.2;color:var(--sub)}
+.node.is-locked{box-shadow:0 0 0 1px var(--lockline)}
+.node.is-next{background:#fff6ea}
+.node.is-next .n-state{color:#9a4508;font-weight:700}
+.node.is-selected{background:#fff;box-shadow:0 0 0 2px var(--act),0 2px 6px rgba(29,39,51,.12)}
+.ghost{position:absolute;width:10px;height:10px;border-radius:50%;background:#cfd5bd;transform:translate(-50%,-50%)}
+.map-cap{margin:8px 0 0;font-size:12px;color:var(--sub)}
+
+/* C list */
+.c-body-wrap{grid-template-columns:minmax(0,440px) minmax(0,1fr)}
+.qhead{display:flex;justify-content:space-between;padding:0 4px 6px;font-size:13px;color:var(--sub)}
+.qhead b{color:var(--ink)}
+.qlist{margin:0;padding:0;list-style:none;border:1px solid var(--line);border-radius:10px;background:var(--paper);overflow:hidden}
+.qlist li+li{border-top:1px solid #efe6d2}
+.row{position:relative;display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;min-height:52px;padding:6px 12px;border:0;background:transparent;text-align:left}
+.row:hover{background:#f8f2e4}
+.row:focus-visible{outline-offset:-3px}
+.row .ic{width:28px;height:28px}
+.row.is-locked .ic{opacity:.75}
+.r-main{min-width:0}
+.r-name{display:block;font-size:15px;font-weight:700;line-height:1.25}
+.r-info{display:block;font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-info em{font-style:normal;font-weight:700;color:#9a4508}
+.row.is-selected{background:#eaf1fc}
+.row.is-selected::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--act)}
+
+/* shared detail */
+#ground-detail{padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+.d-head{display:flex;align-items:center;gap:12px}
+.d-art{flex:none;width:64px;height:64px;border-radius:10px;box-shadow:0 0 0 1px var(--line)}
+.d-region{margin:0;font-size:12px;color:var(--sub)}
+#d-name{margin:0 0 2px;font-size:20px;line-height:1.3}
+#d-desc{margin:12px 0 4px}
+.d-state{margin:0;font-size:13px;font-weight:700;color:var(--sub)}
+.goal{margin-top:12px;padding:10px 12px;border:1px solid #efdcb8;border-radius:10px;background:#fbf3e4}
+.goal-k{margin:0 0 6px;font-size:13px;font-weight:700}
+.segs{display:flex;gap:4px}
+.segs i{flex:1;height:10px;border-radius:2px;background:#e8dcc2}
+.segs i.on{background:var(--focus)}
+.goal-cap{margin:6px 0 0;font-size:12px;color:var(--sub)}
+.start-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:14px}
+#demo-start{min-height:48px;padding:0 20px;border:0;border-radius:10px;background:var(--act);color:#fff;font-size:15px;font-weight:700}
+#demo-start:disabled{background:#e9e3d4;color:#625c4e;box-shadow:inset 0 0 0 1px var(--lockline);cursor:not-allowed}
+.reason{margin:0;font-size:13px;font-weight:700;color:#7a4a12}
+.notice{margin:10px 0 0;font-size:13px}
+.notice:empty{margin:0}
+.notice:not(:empty){padding:8px 10px;border-radius:8px;background:#eaf1fc;color:#1d3f7a}
+
+/* A desktop: detail as a wide strip under the grid */
+@media (min-width:821px){
+  #stage:not(.compare) .scene-a #ground-detail{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:center}
+  #stage:not(.compare) .scene-a .start-row{margin-top:0}
+}
+/* compare: each column uses the narrow layout */
+.compare .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.compare .card .art{height:72px}
+.compare .card .art svg{width:48px;height:48px}
+.compare .b-body,.compare .c-body-wrap{grid-template-columns:1fr}
+.compare .map{aspect-ratio:10/12}
+.compare .scene .slot{display:none}
+
+@media (max-width:999px){#compare-toggle{display:none}.b-body{grid-template-columns:1fr}}
+@media (max-width:820px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .b-body,.c-body-wrap{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+  .map{aspect-ratio:10/12}
+  .wrap{padding:12px 12px 32px}
+  h1{font-size:18px}
+  .card .art{height:64px}
+  .card .art svg{width:44px;height:44px}
+  .c-body{padding:8px 10px 10px}
+  .c-name{font-size:15px}
+  .c-tags{font-size:12px;margin-bottom:6px}
+  .check,.lockmark{top:6px;width:24px;height:24px}
+  .check{right:6px}.lockmark{left:6px}
+}
+@media (max-width:400px){
+  .seg{flex:1}
+  .seg button{flex:1;min-width:0;padding:0 6px}
+  .filters button{padding:0 12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="top">
+      <div class="brand"><span class="logo">MARCA</span><span class="slash">/</span><h1>사냥터 선택 시안</h1></div>
+      <span class="badge">비교용 데모 · 실제 게임 미연결</span>
+    </div>
+    <p class="note">장소·수치는 비교용 예시입니다. 개방 기준과 숙련도 규칙은 미확정입니다.</p>
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="시안 선택">
+        <button type="button" data-variant="A" aria-pressed="false">A 카드</button>
+        <button type="button" data-variant="B" aria-pressed="false">B 지도</button>
+        <button type="button" data-variant="C" aria-pressed="false">C 목록</button>
+      </div>
+      <button type="button" id="compare-toggle" aria-pressed="false">비교 보기</button>
+    </div>
+    <p class="caption" id="variant-caption"></p>
+  </header>
+
+  <div class="bar">
+    <div class="filters" role="group" aria-label="개방 상태 필터">
+      <button type="button" data-filter="all" aria-pressed="true">전체<span class="n"></span></button>
+      <button type="button" data-filter="open" aria-pressed="false">개방<span class="n"></span></button>
+      <button type="button" data-filter="locked" aria-pressed="false">미개방<span class="n"></span></button>
+    </div>
+    <p id="selection-status" role="status" aria-live="polite"></p>
+  </div>
+
+  <main id="stage">
+    <section class="scene scene-a" data-scene="A" aria-label="A 카드 시안" hidden>
+      <h2 class="scene-h">A 카드<span>그림과 특징을 비교해 선택</span></h2>
+      <div class="scene-in"></div>
+    </section>
+    <section class="scene scene-b" data-scene="B" aria-label="B 지도 시안" hidden>
+      <h2 class="scene-h">B 지도<span>위치와 다음 목표를 보며 선택</span></h2>
+      <div class="scene-in"></div>
+    </section>
+    <section class="scene scene-c" data-scene="C" aria-label="C 목록 시안" hidden>
+      <h2 class="scene-h">C 목록<span>목록에서 빠르게 찾아 선택</span></h2>
+      <div class="scene-in"></div>
+    </section>
+    <div id="compare-slot" hidden></div>
+  </main>
+
+  <div id="detail-home" hidden>
+    <section id="ground-detail" aria-labelledby="d-name">
+      <div class="d-main">
+        <div class="d-head">
+          <span class="d-art ic" id="d-art"></span>
+          <div>
+            <p class="d-region">마을 근교 · 선택한 사냥터</p>
+            <h2 id="d-name"></h2>
+            <div class="pills" id="d-pills"></div>
+          </div>
+        </div>
+        <p id="d-desc"></p>
+        <p id="d-state" class="d-state"></p>
+        <div id="d-goal" class="goal" hidden>
+          <p class="goal-k">다음 목표 · 성장 진행(기준 미정)</p>
+          <div class="segs" role="img" aria-label="진행 표현 예시, 5칸 중 3칸"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+          <p class="goal-cap">진행 표현 예시 · 실제 수치 아님</p>
+        </div>
+      </div>
+      <div class="d-act">
+        <div class="start-row">
+          <button type="button" id="demo-start" aria-describedby="d-reason">여기서 사냥해 보기</button>
+          <p id="d-reason" class="reason"></p>
+        </div>
+        <p id="demo-status" class="notice" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---- 모든 시안이 공유하는 단일 데모 데이터 ----
+  var REGION = '마을 근교';
+  var NEXT = 'mist';
+  var PAL = {
+    g: '#8cc15a', G: '#5f9a3c', y: '#f2c84b', t: '#8a5a35', l: '#6fb24f', L: '#3f7f3a',
+    s: '#bdb5a3', S: '#8d8676', c: '#2f3440', r: '#cfc3a6', R: '#9c8f74', w: '#ffffff', m: '#7f9a83', M: '#5c7562'
+  };
+  var GROUNDS = [
+    { id: 'meadow', name: '들녘', open: true, tags: '트인 들판 · 들꽃', desc: '낮은 풀과 들꽃이 넓게 펼쳐진 트인 들판.',
+      sky: '#dcedf3', pos: [18, 86],
+      art: ['......yy', '......yy', '........', 'gggggggg', 'gyggGggg', 'ggggggyg', 'GggGgggG', 'gggygggg'] },
+    { id: 'forest', name: '바람숲', open: true, tags: '숲길 · 나무 그늘', desc: '바람이 잘 드는 밝은 숲길과 나무 그늘.',
+      sky: '#e2efd9', pos: [50, 64],
+      art: ['..L...L.', '.LlL.LlL', 'LlllLlll', '.LlL.LlL', '..t...t.', '..t...t.', 'gggggggg', 'GgGggGgG'] },
+    { id: 'hill', name: '돌언덕', open: true, tags: '바위 · 완만한 비탈', desc: '바위가 드문드문 솟은 완만한 언덕.',
+      sky: '#e5ebef', pos: [82, 86],
+      art: ['........', '...ss...', '..sSss..', '.ssssSs.', 'sSsssssS', 'ssSsSsss', 'gsggsggs', 'gggggggg'] },
+    { id: 'mist', name: '안개숲', open: false, tags: '옅은 안개 · 깊은 숲', desc: '옅은 안개가 낮게 깔린 깊은 숲.',
+      sky: '#dde4dc', pos: [22, 38],
+      art: ['wwwwwwww', '.MM..MM.', 'MmmMMmmM', 'wwwwwwww', 'MmM..MmM', '.t....t.', 'wwwwwwww', 'GgGgGgGg'] },
+    { id: 'cave', name: '메아리 동굴', open: false, tags: '어두운 굴 · 울림', desc: '소리가 길게 울리는 서늘한 동굴.',
+      sky: '#ddd6c6', pos: [78, 40],
+      art: ['SSSSSSSS', 'SssSsssS', 'sssccsss', 'ssccccss', 'sccccccs', 'sccccccs', 'Sccccccs', 'SSggggSS'] },
+    { id: 'ruins', name: '고요한 폐허', open: false, tags: '무너진 돌기둥 · 옛터', desc: '무너진 돌기둥만 남은 조용한 옛터.',
+      sky: '#efe8d8', pos: [50, 14],
+      art: ['........', 'rrrrrr..', '.rR..r..', '.rR..rR.', '.rR..rR.', '.rR..rR.', 'gggRrggg', 'GgggGggg'] }
+  ];
+  // 개념도 연결선: 발견 표현용일 뿐 이동/선행 조건이 아님
+  var EDGES = [['meadow', 'forest'], ['forest', 'hill'], ['forest', 'mist'], ['forest', 'cave'], ['mist', 'ruins'], ['cave', 'ruins']];
+  var VARIANTS = {
+    A: '그림과 특징을 비교해 선택',
+    B: '위치와 다음 목표를 보며 선택',
+    C: '목록에서 빠르게 찾아 선택'
+  };
+  var BY = {};
+  GROUNDS.forEach(function (g) { BY[g.id] = g; });
+
+  var S = { variant: 'A', selected: 'forest', filter: 'all', compare: false };
+  var qv = (new URLSearchParams(location.search).get('variant') || '').toUpperCase();
+  if (VARIANTS[qv]) S.variant = qv;
+
+  function $(s) { return document.querySelector(s); }
+  function $$(s) { return Array.prototype.slice.call(document.querySelectorAll(s)); }
+  var stage = $('#stage'), home = $('#detail-home'), cslot = $('#compare-slot'), detail = $('#ground-detail');
+
+  // ---- 픽셀 아트 (같은 행의 같은 색은 하나의 rect로 묶음) ----
+  function pix(rows, pal, bg) {
+    var h = rows.length, w = rows[0].length;
+    var out = bg ? '<rect width="' + w + '" height="' + h + '" fill="' + bg + '"/>' : '';
+    rows.forEach(function (row, y) {
+      var x = 0;
+      while (x < w) {
+        var ch = row[x], n = 1;
+        while (x + n < w && row[x + n] === ch) n++;
+        if (ch !== '.') out += '<rect x="' + x + '" y="' + y + '" width="' + n + '" height="1" fill="' + pal[ch] + '"/>';
+        x += n;
+      }
+    });
+    return '<svg viewBox="0 0 ' + w + ' ' + h + '" shape-rendering="crispEdges" aria-hidden="true" focusable="false">' + out + '</svg>';
+  }
+  function art(g) { return pix(g.art, PAL, g.sky); }
+  var LOCK = pix(['.kkk.', 'k...k', 'k...k', 'kkkkk', 'kkwkk', 'kkkkk'], { k: '#4a4234', w: '#f1ece0' });
+  var EMPTY = '<p class="empty">이 조건에 맞는 사냥터가 없습니다.</p>';
+
+  function shown(g) { return S.filter === 'all' || (S.filter === 'open') === g.open; }
+  function avail(g) { return g.open ? '<span class="pill ok">개방</span>' : '<span class="pill lock">' + LOCK + '미개방</span>'; }
+  function pills(g) { return avail(g) + (g.id === NEXT ? '<span class="pill next">다음 목표</span>' : ''); }
+
+  // ---- A: 지역 탭 + 그림 카드 ----
+  function renderA(list) {
+    var cards = list.map(function (g) {
+      return '<li><button type="button" class="card' + (g.open ? '' : ' is-locked') + '" data-ground="' + g.id + '" aria-pressed="false">' +
+        '<span class="art" style="background:' + g.sky + '">' + art(g) + '</span>' +
+        (g.open ? '' : '<span class="lockmark" aria-hidden="true">' + LOCK + '</span>') +
+        '<span class="check" aria-hidden="true"></span>' +
+        '<span class="c-body"><span class="c-name">' + g.name + '</span><span class="c-tags">' + g.tags + '</span>' +
+        '<span class="pills">' + pills(g) + '</span></span></button></li>';
+    }).join('');
+    return '<div class="tabs"><span class="tab" aria-current="true">' + REGION + '</span><span class="tab-sub">지형 그림 비교</span></div>' +
+      (list.length ? '<ul class="grid">' + cards + '</ul>' : EMPTY) + '<div class="slot"></div>';
+  }
+
+  // ---- B: 탐험 위치 개념도 ----
+  function renderB(list) {
+    var lines = EDGES.map(function (e) {
+      var a = BY[e[0]], b = BY[e[1]];
+      return '<line x1="' + a.pos[0] + '" y1="' + a.pos[1] + '" x2="' + b.pos[0] + '" y2="' + b.pos[1] + '" class="' + (a.open && b.open ? 'p-open' : 'p-lock') + '"/>';
+    }).join('');
+    var nodes = GROUNDS.map(function (g) {
+      var st = 'left:' + g.pos[0] + '%;top:' + g.pos[1] + '%';
+      if (!shown(g)) return '<span class="ghost" style="' + st + '" aria-hidden="true"></span>';
+      var next = g.id === NEXT;
+      return '<button type="button" class="node' + (g.open ? '' : ' is-locked') + (next ? ' is-next' : '') + '" data-ground="' + g.id + '" aria-pressed="false" style="' + st + '"' +
+        ' aria-label="' + g.name + ', ' + (g.open ? '개방' : '미개방') + (next ? ', 다음 목표' : '') + '">' +
+        '<span class="n-icon"><span class="ic">' + art(g) + '</span>' + (g.open ? '' : '<span class="lk">' + LOCK + '</span>') + '</span>' +
+        '<span class="n-label">' + g.name + '</span><span class="n-state">' + (next ? '다음 목표' : g.open ? '개방' : '미개방') + '</span></button>';
+    }).join('');
+    return '<div class="b-body"><div>' +
+      '<div class="map-h"><span>' + REGION + '</span><span class="legend" aria-hidden="true"><span><i class="lg-open"></i>개방</span><span><i class="lg-lock"></i>미개방</span><span><i class="lg-next"></i>다음 목표</span></span></div>' +
+      '<div class="map" role="group" aria-label="' + REGION + ' 탐험 위치 개념도">' +
+      '<svg class="paths" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">' + lines + '</svg>' + nodes + '</div>' +
+      (list.length ? '' : EMPTY) +
+      '<p class="map-cap">탐험 위치 개념도 · 실제 이동/선행 조건 아님</p></div><div class="slot"></div></div>';
+  }
+
+  // ---- C: 빠른 목록 + 검사 패널 ----
+  function renderC(list) {
+    var rows = list.map(function (g) {
+      return '<li><button type="button" class="row' + (g.open ? '' : ' is-locked') + '" data-ground="' + g.id + '" aria-pressed="false">' +
+        '<span class="ic">' + art(g) + '</span>' +
+        '<span class="r-main"><span class="r-name">' + g.name + '</span><span class="r-info">' + (g.id === NEXT ? '<em>다음 목표</em> · ' : '') + g.tags + '</span></span>' +
+        avail(g) + '</button></li>';
+    }).join('');
+    return '<div class="c-body-wrap"><div>' +
+      '<div class="qhead"><b>' + REGION + '</b><span>' + list.length + '/' + GROUNDS.length + '곳 표시</span></div>' +
+      (list.length ? '<ul class="qlist">' + rows + '</ul>' : EMPTY) + '</div><div class="slot"></div></div>';
+  }
+  var RENDER = { A: renderA, B: renderB, C: renderC };
+
+  function render() {
+    home.appendChild(detail);
+    var list = GROUNDS.filter(shown);
+    stage.classList.toggle('compare', S.compare);
+    $$('.scene').forEach(function (sc) {
+      var v = sc.getAttribute('data-scene'), on = S.compare || S.variant === v;
+      sc.hidden = !on;
+      sc.querySelector('.scene-in').innerHTML = on ? RENDER[v](list) : '';
+    });
+    cslot.hidden = !S.compare;
+    (S.compare ? cslot : $('.scene[data-scene="' + S.variant + '"] .slot')).appendChild(detail);
+
+    $$('[data-variant]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(!S.compare && b.getAttribute('data-variant') === S.variant));
+    });
+    $$('[data-filter]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-filter') === S.filter));
+    });
+    $('#compare-toggle').setAttribute('aria-pressed', String(S.compare));
+    $('#variant-caption').textContent = S.compare ? '세 시안 나란히 보기 · 선택과 필터 공유' : VARIANTS[S.variant];
+    syncSelection();
+  }
+
+  function syncSelection() {
+    var g = BY[S.selected];
+    $$('[data-ground]').forEach(function (el) {
+      var on = el.getAttribute('data-ground') === S.selected;
+      el.classList.toggle('is-selected', on);
+      el.setAttribute('aria-pressed', String(on));
+    });
+    $('#d-art').innerHTML = art(g);
+    $('#d-name').textContent = g.name;
+    $('#d-pills').innerHTML = pills(g);
+    $('#d-desc').textContent = g.desc;
+    $('#d-state').textContent = g.open ? '개방됨 · 입장 가능 여부와 승리는 별개입니다.' : '미개방 · 개방 조건 미확정';
+    $('#d-goal').hidden = g.id !== NEXT;
+    $('#demo-start').disabled = !g.open;
+    var reason = $('#d-reason');
+    reason.textContent = g.open ? '' : '미개방 사냥터라 시작할 수 없습니다.';
+    reason.hidden = g.open;
+    $('#selection-status').innerHTML = '선택: <b>' + g.name + '</b> · ' + (g.open ? '개방' : '미개방') +
+      (shown(g) ? '' : ' <span class="hid">(현재 필터에서 숨김)</span>');
+  }
+
+  // ---- 이벤트 (선택과 시작은 분리) ----
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button');
+    if (!t) return;
+    if (t.hasAttribute('data-ground')) {
+      var id = t.getAttribute('data-ground');
+      if (id !== S.selected) {
+        S.selected = id;
+        $('#demo-status').textContent = '';
+        syncSelection();
+      }
+    } else if (t.hasAttribute('data-filter')) {
+      S.filter = t.getAttribute('data-filter');
+      render();
+    } else if (t.hasAttribute('data-variant')) {
+      S.variant = t.getAttribute('data-variant');
+      S.compare = false;
+      render();
+    } else if (t.id === 'compare-toggle') {
+      S.compare = !S.compare;
+      render();
+    } else if (t.id === 'demo-start') {
+      if (BY[S.selected].open) $('#demo-status').textContent = '시안 확인 완료 — 실제 사냥은 실행되지 않았습니다.';
+    }
+  });
+
+  var wide = window.matchMedia('(min-width: 1000px)');
+  function onWide() { if (!wide.matches && S.compare) { S.compare = false; render(); } }
+  if (wide.addEventListener) wide.addEventListener('change', onWide); else wide.addListener(onWide);
+
+  // 필터 버튼 개수 표시 (데모 데이터에서 계산)
+  var counts = { all: GROUNDS.length, open: 0, locked: 0 };
+  GROUNDS.forEach(function (g) { counts[g.open ? 'open' : 'locked']++; });
+  $$('[data-filter]').forEach(function (b) { b.querySelector('.n').textContent = counts[b.getAttribute('data-filter')]; });
+
+  render();
+})();
+</script>
+</body>
+</html>
